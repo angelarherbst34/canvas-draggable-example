@@ -1,39 +1,14 @@
 import { useCanvasStore } from '@/store'
-import { CanvasContext, Draw } from '@/types'
-import { useEffect, useState } from 'react'
-
-function resizeCanvas(context: CanvasContext) {
-  if (!context) return
-  const canvas: HTMLCanvasElement = context.canvas
-  const { width, height } = canvas.getBoundingClientRect()
-
-  if (canvas.width !== width || canvas.height !== height) {
-    // Use a temporary canvas to complete the size changes to avoid flicker
-    const tempCanvas = document.createElement('canvas')
-    tempCanvas.width = canvas.width
-    tempCanvas.height = canvas.height
-    const tempContext = tempCanvas.getContext('2d')
-
-    if (tempContext) {
-      tempContext.drawImage(canvas, 0, 0)
-      canvas.width = width
-      canvas.height = height
-      context.drawImage(tempContext.canvas, 0, 0)
-    }
-  }
-}
+import { Draw } from '@/types'
+import { getCanvasContext, resizeCanvas } from '@/utils'
+import { useEffect } from 'react'
 
 export const useCanvas = (draw: Draw) => {
-  const { ref } = useCanvasStore()
+  const { ref, canvasImages } = useCanvasStore()
 
   useEffect(() => {
-    if (!ref) return
-
-    const context: CanvasContext =
-      ref.getContext('2d', {
-        alpha: false,
-      }) ?? null
-    if (!context) return
+    const context = getCanvasContext(ref)
+    if (!ref || !context) return
 
     // Calculate size and complete the initial draw of the canvas
     const render = () => {
@@ -52,12 +27,17 @@ export const useCanvas = (draw: Draw) => {
       window.cancelAnimationFrame(frameId)
     }
   }, [draw, ref])
-}
 
-export const useCanvasContext = (): CanvasContext => {
-    const { ref } = useCanvasStore()
-    return (ref?.getContext('2d', {
-      alpha: false,
-    }) ?? null) as CanvasContext
-}
+  // Draw images whenever they are added or changed
+  useEffect(() => {
+    const context = getCanvasContext(ref)
+    if (!ref || !context) return
 
+    const canvas = context.canvas
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    canvasImages.forEach((canvasImage) => {
+        const { image, x, y } = canvasImage
+        context.drawImage(image, x, y)
+    })
+}, [canvasImages, ref])
+}

@@ -2,58 +2,49 @@ import '@/css/components/Canvas.css'
 
 import { useCanvas } from '@/hooks'
 import { useCanvasStore } from '@/store'
-import { CanvasImage, CanvasRef, Draw } from '@/types'
+import { Draw, SelectedCanvasImage } from '@/types'
 import { memo, MouseEvent, useCallback, useState } from 'react'
 
 export const Canvas = memo(function Canvas(
   props: React.DetailedHTMLProps<
     React.CanvasHTMLAttributes<HTMLCanvasElement>,
     HTMLCanvasElement
-  > & {
-    draw: Draw
-    getClickedImage: (x: number, y: number) => CanvasImage | undefined
-    moveImage: (
-      x: number,
-      y: number,
-      image: CanvasImage,
-      ref: CanvasRef,
-    ) => void
-  },
+  > & { draw: Draw },
 ) {
-  const { draw, getClickedImage, moveImage, ...rest } = props
+  const { draw, ...rest } = props
 
-  const { ref, setRef } = useCanvasStore()
-  const setRefCallback = useCallback(setRef, [setRef])
+  // Perform logic to resize and draw the canvas + images
   useCanvas(draw)
 
-  const [startX, setStartX] = useState<number>(0)
-  const [startY, setStartY] = useState<number>(0)
-  const [currentImage, setCurrentImage] = useState<CanvasImage | null>(null)
+  // Click handlers to drag an image
+  const { ref, setRef, moveCanvasImage, getClickedCanvasImage } =
+    useCanvasStore()
+  const setRefCallback = useCallback(setRef, [setRef])
+
+  const [selectedCanvasImage, setSelectedCanvasImage] =
+    useState<SelectedCanvasImage | null>(null)
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const x = Number(e.clientX)
     const y = Number(e.clientY)
 
-    setStartX(x)
-    setStartY(y)
-
-    const image = getClickedImage(x, y)
-    if (image) setCurrentImage(image)
+    const canvasImage = getClickedCanvasImage(x, y)
+    if (canvasImage) setSelectedCanvasImage({ x, y, canvasImage })
   }
   const handleMouseUpOrOut = () => {
-    if (!currentImage) return
-    setCurrentImage(null)
+    if (!selectedCanvasImage) return
+    setSelectedCanvasImage(null)
   }
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (!currentImage) return
+    if (!selectedCanvasImage) return
 
     const x = Number(e.clientX)
     const y = Number(e.clientY)
 
-    const dx = x - startX
-    const dy = y - startY
+    const dx = x - selectedCanvasImage.x
+    const dy = y - selectedCanvasImage.y
 
-    if (ref) moveImage(dx, dy, currentImage, ref)
+    if (ref) moveCanvasImage(dx, dy, selectedCanvasImage.canvasImage)
   }
 
   return (
