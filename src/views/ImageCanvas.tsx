@@ -7,6 +7,8 @@ import { useCanvasStore } from '@/store'
 export function ImageCanvas() {
   const { addCanvasImage } = useCanvasStore()
 
+  // Uses useCallback as these methods are a dependency of a useEffect
+  // Without it they will continuously be called
   const loadImage = useCallback(
     (context: CanvasContext, url: string, x: number, y: number) => {
       if (!context) return
