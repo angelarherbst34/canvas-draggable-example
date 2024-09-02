@@ -1,8 +1,8 @@
-import 'css/App.css'
-import { Canvas } from '@/components/Canvas'
+import '@/css/App.css'
+import ImageCanvas from '@/views/ImageCanvas'
 
 function App() {
-  return <Canvas />
+  return <ImageCanvas />
 }
 
 export default App

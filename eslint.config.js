@@ -42,6 +42,8 @@ export default tseslint.config(
           semi: false,
         },
       ],
+      "no-console": "warn",
+      "@typescript-eslint/no-confusing-void-expression": "off",
     },
   },
   eslintPluginPrettierRecommended,

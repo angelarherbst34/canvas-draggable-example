@@ -22,7 +22,6 @@
     
     "paths": {
       "@/*": ["./src/*"],
-      "css/*": ["./src/css/*"]
     }
   },
   "include": ["src"]
