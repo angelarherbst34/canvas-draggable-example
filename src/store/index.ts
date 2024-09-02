@@ -7,10 +7,6 @@ import {
 import { isCoordWithinBounds, isImageInCanvas } from '@/utils'
 import { create } from 'zustand'
 
-// To save to localStorage
-// import { persist } from 'zustand/middleware'
-// persist(() => ({}), { name: 'canvas-storage' }),
-
 type CanvasRef = HTMLCanvasElement | null
 interface CanvasState {
   ref: CanvasRef
@@ -52,7 +48,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     ) => {
       const canvasImagesCopy = [...get().canvasImages]
       const index = canvasImagesCopy.findIndex(
-        (canvasImage) => canvasImage.image === image.image,
+        (canvasImage) => canvasImage.id === image.id,
       )
 
       const newImage = {
