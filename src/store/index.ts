@@ -1,4 +1,5 @@
-import { CanvasImage } from '@/types'
+import { CanvasDimensions, CanvasImage, Coordinate } from '@/types'
+import { isCoordWithinBounds, isImageInCanvas } from '@/utils'
 import { create } from 'zustand'
 
 // To save to localStorage
@@ -10,12 +11,17 @@ interface CanvasState {
   ref: CanvasRef
   canvasImages: CanvasImage[]
 }
+
 interface CanvasActions {
   setRef: (ref: CanvasRef) => void
   addCanvasImage: (canvasImage: CanvasImage) => void
   setCanvasImages: (canvasImages: CanvasImage[]) => void
-  moveCanvasImage: (dx: number, dy: number, image: CanvasImage) => void
-  getClickedCanvasImage: (x: number, y: number) => CanvasImage | undefined
+  moveCanvasImage: (
+    image: CanvasImage,
+    coord: Coordinate,
+    canvasDimensions: CanvasDimensions | null,
+  ) => void
+  getClickedCanvasImage: (coord: Coordinate) => CanvasImage | undefined
 }
 export const useCanvasStore = create<CanvasState & CanvasActions>(
   (set, get) => ({
@@ -27,24 +33,33 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     setCanvasImages: (canvasImages: CanvasImage[]) => set({ canvasImages }),
     addCanvasImage: (canvasImage: CanvasImage) =>
       set((state) => ({ canvasImages: [...state.canvasImages, canvasImage] })),
-    moveCanvasImage: (dx: number, dy: number, image: CanvasImage) => {
+    moveCanvasImage: (
+      image: CanvasImage,
+      coord: Coordinate,
+      canvasDimensions: CanvasDimensions | null,
+    ) => {
       const canvasImagesCopy = [...get().canvasImages]
       const index = canvasImagesCopy.findIndex(
         (canvasImage) => canvasImage.image === image.image,
       )
-      const newImage = { ...image, x: image.x + dx, y: image.y + dy }
+
+      const newImage = {
+        ...image,
+        x: image.x + coord.x,
+        y: image.y + coord.y,
+      }
+
+      // If this move will place the image outside of the canvas then don't move it
+      const isInCanvas = isImageInCanvas(canvasDimensions, newImage)
+      if (!isInCanvas) return
+
       canvasImagesCopy.splice(index, 1, newImage)
       set({ canvasImages: canvasImagesCopy })
     },
-    getClickedCanvasImage: (x: number, y: number) => {
+    getClickedCanvasImage: (coord: Coordinate) => {
       const canvasImages = get().canvasImages
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const index: number = canvasImages.findLastIndex(
-        (canvasImage: CanvasImage) =>
-          canvasImage.x < x &&
-          canvasImage.y < y &&
-          x < canvasImage.x + canvasImage.width &&
-          y < canvasImage.y + canvasImage.height,
+        (canvasImage: CanvasImage) => isCoordWithinBounds(canvasImage, coord),
       )
       return index === -1 ? undefined : canvasImages[index]
     },

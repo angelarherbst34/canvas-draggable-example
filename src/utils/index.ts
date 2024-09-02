@@ -1,4 +1,10 @@
-import { CanvasContext, CanvasRef } from '@/types'
+import {
+  CanvasContext,
+  CanvasDimensions,
+  CanvasImage,
+  CanvasRef,
+  Coordinate,
+} from '@/types'
 
 export function resizeCanvas(context: CanvasContext) {
   if (!context) return
@@ -26,4 +32,40 @@ export const getCanvasContext = (ref: CanvasRef) => {
       alpha: false,
     }) ?? null
   )
+}
+export function isCoordWithinBounds(
+  dimensions: CanvasDimensions | CanvasImage | null,
+  coordinate: Coordinate,
+): boolean {
+  if (!dimensions) return false
+  return (
+    dimensions.x < coordinate.x &&
+    dimensions.y < coordinate.y &&
+    coordinate.x < dimensions.x + dimensions.width &&
+    coordinate.y < dimensions.y + dimensions.height
+  )
+}
+export function isImageInCanvas(
+  canvasDimensions: CanvasDimensions | null,
+  canvasImage: CanvasImage,
+) {
+  if (!canvasDimensions) return
+  return (
+    isCoordWithinBounds(canvasDimensions, canvasImage) &&
+    isCoordWithinBounds(canvasDimensions, {
+      x: canvasImage.x + canvasImage.width,
+      y: canvasImage.y + canvasImage.height,
+    })
+  )
+}
+export function getCanvasDimentions(
+  context: CanvasContext,
+): CanvasDimensions | null {
+  if (!context) return null
+  return {
+    x: 0,
+    y: 0,
+    width: context.canvas.width,
+    height: context.canvas.height,
+  }
 }

@@ -1,7 +1,14 @@
 import { useCanvasStore } from '@/store'
-import { Draw } from '@/types'
-import { getCanvasContext, resizeCanvas } from '@/utils'
+import { CanvasDimensions, Draw } from '@/types'
+import { getCanvasContext, getCanvasDimentions, resizeCanvas } from '@/utils'
 import { useEffect } from 'react'
+
+export const useCanvasDimensions = (): CanvasDimensions | null => {
+  const { ref } = useCanvasStore()
+  const context = getCanvasContext(ref)
+  if (!ref || !context) return null
+  return getCanvasDimentions(context)
+}
 
 export const useCanvas = (draw: Draw) => {
   const { ref, canvasImages } = useCanvasStore()
@@ -19,7 +26,7 @@ export const useCanvas = (draw: Draw) => {
 
     // Resize canvas if window size changes
     const observer = new ResizeObserver(() => {
-    resizeCanvas(context)
+      resizeCanvas(context)
     })
     observer.observe(ref)
 
@@ -36,8 +43,8 @@ export const useCanvas = (draw: Draw) => {
     const canvas = context.canvas
     context.clearRect(0, 0, canvas.width, canvas.height)
     canvasImages.forEach((canvasImage) => {
-        const { image, x, y } = canvasImage
-        context.drawImage(image, x, y)
+      const { image, x, y } = canvasImage
+      context.drawImage(image, x, y)
     })
-}, [canvasImages, ref])
+  }, [canvasImages, ref])
 }

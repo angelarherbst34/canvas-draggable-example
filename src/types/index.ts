@@ -1,16 +1,17 @@
+export type CanvasRef = HTMLCanvasElement | null
 export type CanvasContext = CanvasRenderingContext2D | null
 export type Draw = (ctx?: CanvasContext) => void
-export interface Coordinates {
+export interface Coordinate {
   x: number
   y: number
 }
-export interface SelectedCanvasImage extends Coordinates {
+export interface SelectedCanvasImage extends Coordinate {
   canvasImage: CanvasImage
 }
-export interface CanvasImage extends Coordinates {
-  image: HTMLImageElement
+export interface CanvasDimensions extends Coordinate {
   width: number
   height: number
 }
-
-export type CanvasRef = HTMLCanvasElement | null
+export interface CanvasImage extends CanvasDimensions {
+  image: HTMLImageElement
+}
