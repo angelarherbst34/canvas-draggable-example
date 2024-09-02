@@ -2,8 +2,8 @@ import '@/css/components/Canvas.css'
 
 import { useCanvas, useCanvasDimensions } from '@/hooks'
 import { useCanvasStore } from '@/store'
-import { Draw, SelectedCanvasImage } from '@/types'
-import { memo, MouseEvent, useState } from 'react'
+import { Draw } from '@/types'
+import { memo, MouseEvent } from 'react'
 
 export const Canvas = memo(function Canvas(
   props: React.DetailedHTMLProps<
@@ -17,12 +17,15 @@ export const Canvas = memo(function Canvas(
   useCanvas(draw)
 
   // Click handlers to drag an image
-  const { ref, setRef, moveCanvasImage, getClickedCanvasImage } =
-    useCanvasStore()
+  const {
+    ref,
+    setRef,
+    moveCanvasImage,
+    getClickedCanvasImage,
+    selectedCanvasImage,
+    setSelectedCanvasImage,
+  } = useCanvasStore()
   const canvasDimensions = useCanvasDimensions()
-
-  const [selectedCanvasImage, setSelectedCanvasImage] =
-    useState<SelectedCanvasImage | null>(null)
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     const x = Number(e.clientX)

@@ -3,6 +3,7 @@ import { Canvas } from '@/components/Canvas'
 import { CanvasContext, CanvasImage, Draw } from '@/types'
 import { useCallback } from 'react'
 import { useCanvasStore } from '@/store'
+import { v4 as uuidv4 } from 'uuid'
 
 export function ImageCanvas() {
   const { addCanvasImage } = useCanvasStore()
@@ -23,6 +24,7 @@ export function ImageCanvas() {
           y,
           width: image.width,
           height: image.height,
+          id: uuidv4(),
         }
         addCanvasImage(canvasImage)
       }

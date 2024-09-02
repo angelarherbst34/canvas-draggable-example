@@ -14,4 +14,5 @@ export interface CanvasDimensions extends Coordinate {
 }
 export interface CanvasImage extends CanvasDimensions {
   image: HTMLImageElement
+  id: string
 }

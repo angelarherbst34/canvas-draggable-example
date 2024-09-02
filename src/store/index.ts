@@ -1,4 +1,9 @@
-import { CanvasDimensions, CanvasImage, Coordinate } from '@/types'
+import {
+  CanvasDimensions,
+  CanvasImage,
+  Coordinate,
+  SelectedCanvasImage,
+} from '@/types'
 import { isCoordWithinBounds, isImageInCanvas } from '@/utils'
 import { create } from 'zustand'
 
@@ -10,10 +15,14 @@ type CanvasRef = HTMLCanvasElement | null
 interface CanvasState {
   ref: CanvasRef
   canvasImages: CanvasImage[]
+  selectedCanvasImage: SelectedCanvasImage | null
 }
 
 interface CanvasActions {
   setRef: (ref: CanvasRef) => void
+  setSelectedCanvasImage: (
+    selectedCanvasImage: SelectedCanvasImage | null,
+  ) => void
   addCanvasImage: (canvasImage: CanvasImage) => void
   setCanvasImages: (canvasImages: CanvasImage[]) => void
   moveCanvasImage: (
@@ -29,6 +38,9 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     setRef: (ref: CanvasRef) => {
       set({ ref })
     },
+    selectedCanvasImage: null as SelectedCanvasImage | null,
+    setSelectedCanvasImage: (selectedCanvasImage: SelectedCanvasImage | null) =>
+      set({ selectedCanvasImage }),
     canvasImages: [] as CanvasImage[],
     setCanvasImages: (canvasImages: CanvasImage[]) => set({ canvasImages }),
     addCanvasImage: (canvasImage: CanvasImage) =>
