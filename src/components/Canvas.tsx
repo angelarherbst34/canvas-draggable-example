@@ -3,7 +3,7 @@ import '@/css/components/Canvas.css'
 import { useCanvas } from '@/hooks'
 import { useCanvasStore } from '@/store'
 import { Draw, SelectedCanvasImage } from '@/types'
-import { memo, MouseEvent, useCallback, useState } from 'react'
+import { memo, MouseEvent, useState } from 'react'
 
 export const Canvas = memo(function Canvas(
   props: React.DetailedHTMLProps<
@@ -19,7 +19,6 @@ export const Canvas = memo(function Canvas(
   // Click handlers to drag an image
   const { ref, setRef, moveCanvasImage, getClickedCanvasImage } =
     useCanvasStore()
-  const setRefCallback = useCallback(setRef, [setRef])
 
   const [selectedCanvasImage, setSelectedCanvasImage] =
     useState<SelectedCanvasImage | null>(null)
@@ -49,12 +48,12 @@ export const Canvas = memo(function Canvas(
 
   return (
     <canvas
-      ref={setRefCallback}
-      {...rest}
+      ref={setRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUpOrOut}
       onMouseOut={handleMouseUpOrOut}
+      {...rest}
     />
   )
 })
