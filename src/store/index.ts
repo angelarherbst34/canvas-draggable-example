@@ -4,7 +4,11 @@ import {
   Coordinate,
   SelectedCanvasImage,
 } from '@/types'
-import { isCoordWithinBounds, isImageInCanvas } from '@/utils'
+import {
+  getImageCoordsWithinCanvas,
+  isCoordWithinBounds,
+  isImageInCanvas,
+} from '@/utils'
 import { create } from 'zustand'
 
 type CanvasRef = HTMLCanvasElement | null
@@ -51,15 +55,26 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
         (canvasImage) => canvasImage.id === image.id,
       )
 
-      const newImage = {
+      let newImage = {
         ...image,
         x: image.x + coord.x,
         y: image.y + coord.y,
       }
 
-      // If this move will place the image outside of the canvas then don't move it
+      // If the image would be placed outside of the canvas with the new coordinates
+      // then change them to stay within the canvas limits intead
       const isInCanvas = isImageInCanvas(canvasDimensions, newImage)
-      if (!isInCanvas) return
+      if (!isInCanvas) {
+        const imageCoordsWithinCanvas = getImageCoordsWithinCanvas(
+          canvasDimensions,
+          newImage,
+        )
+        newImage = {
+          ...newImage,
+          x: imageCoordsWithinCanvas.x,
+          y: imageCoordsWithinCanvas.y,
+        }
+      }
 
       canvasImagesCopy.splice(index, 1, newImage)
       set({ canvasImages: canvasImagesCopy })

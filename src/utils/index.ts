@@ -58,6 +58,37 @@ export function isImageInCanvas(
     })
   )
 }
+export function getImageCoordsWithinCanvas(
+  dimensions: CanvasDimensions | null,
+  image: CanvasImage,
+): Coordinate {
+  if (!dimensions) return { x: image.x, y: image.y }
+  let x, y
+
+  const rightCanvasLimit = dimensions.width
+  const bottomCanvasLimit = dimensions.height
+
+  const rightImageLimit = image.x + image.width
+  const bottomImageLimit = image.y + image.height
+
+  if (rightCanvasLimit < rightImageLimit) {
+    x = rightCanvasLimit - image.width
+  } else if (image.x < 0) {
+    x = 0
+  } else {
+    x = image.x
+  }
+
+  if (bottomCanvasLimit < bottomImageLimit) {
+    y = bottomCanvasLimit - image.height
+  } else if (image.y < 0) {
+    y = 0
+  } else {
+    y = image.y
+  }
+
+  return { x, y }
+}
 export function getCanvasDimentions(
   context: CanvasContext,
 ): CanvasDimensions | null {
